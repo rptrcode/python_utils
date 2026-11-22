@@ -81,7 +81,15 @@ python3 play_vlc.py /path/to/recordings --clear-and-stop
 
 # Enable VLC's HTTP interface when launching VLC
 python3 play_vlc.py /path/to/recordings --http --http-password 'your-password'
+
+# Working example: replace the password with a strong, unique value
+python3 play_vlc.py /path/to/recordings --clear-and-play --http --http-port 8080 --http-password 'replace-with-a-strong-password' --http-host 0.0.0.0
+
 ```
+
+Binding the HTTP interface to `0.0.0.0` makes it reachable on all network
+interfaces. Use a strong password, or omit `--http-host 0.0.0.0` to keep the
+interface bound to the local RC host.
 
 Available arguments:
 
