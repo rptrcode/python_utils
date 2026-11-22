@@ -20,9 +20,10 @@ def get_files_before_current_hour(
     play_hour: int | None = None,
 ) -> list[Path]:
     """
-    Find .mp3 files named HHMM_DDMMYY.mp3 whose hour (HH) is strictly before
-    the selected hour or current hour (e.g., with hour 10, keeps files with
-    HH < 10 like 0930_211226.mp3).
+    Find .mp3 files named HHMM_DDMMYY.mp3.
+    When play_hour is provided, match only files with that exact HH prefix.
+    Otherwise, preserve the default behavior and match hours strictly before
+    the current hour.
     Read-only: never modifies or deletes any files.
     """
     root = Path(directory)
@@ -40,7 +41,11 @@ def get_files_before_current_hour(
         for path in iterator
         if path.is_file()
         and (m := FILENAME_REGEX.match(path.name)) is not None
-        and int(m.group(1)) < current_hour
+        and (
+            int(m.group(1)) == play_hour
+            if play_hour is not None
+            else int(m.group(1)) < current_hour
+        )
         and (extra_regex is None or extra_regex.search(path.name))
     ]
 
@@ -213,14 +218,14 @@ def open_in_vlc(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Filter HHMM_DDMMYY.mp3 files before the selected or current hour and control VLC (read-only on files)."
+        description="Filter HHMM_DDMMYY.mp3 files by exact selected hour or before the current hour and control VLC."
     )
     parser.add_argument("directory", help="Path to directory containing HHMM_DDMMYY.mp3 files")
     parser.add_argument(
         "--play-hour-files",
         metavar="HH",
         type=parse_hour,
-        help="Use HH as the cutoff hour instead of the current hour (matches filenames with hour < HH)",
+        help="Match only filenames starting with HH (for example, 07 matches 0719_221126.mp3)",
     )
     parser.add_argument("--regex", default=None, help="Optional extra regex to match against filename")
     parser.add_argument("--recursive", action="store_true", help="Search subdirectories recursively")
@@ -281,9 +286,16 @@ def main() -> None:
         play_hour=args.play_hour_files,
     )
 
-    cutoff_hour = args.play_hour_files if args.play_hour_files is not None else now.hour
-    hour_label = "Selected hour" if args.play_hour_files is not None else "Current hour"
-    print(f"{hour_label}: {cutoff_hour:02d}:xx | Matching files with hour < {cutoff_hour:02d}: {len(matches)}")
+    if args.play_hour_files is not None:
+        print(
+            f"Selected hour: {args.play_hour_files:02d}:xx | "
+            f"Matching files starting with {args.play_hour_files:02d}: {len(matches)}"
+        )
+    else:
+        print(
+            f"Current hour: {now.hour:02d}:xx | "
+            f"Matching files with hour < {now.hour:02d}: {len(matches)}"
+        )
     for m in matches:
         print("  Matched:", m.name)
 

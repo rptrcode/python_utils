@@ -52,9 +52,11 @@ python3 main.py <command> --help
 `play_vlc.py` is a standalone script (run directly, not through `main.py`) that
 finds MP3 files named `HHMM_DDMMYY.mp3` and opens them in VLC. By default, it
 selects files whose filename hour (`HH`) is earlier than the current hour.
-Optionally, provide `--play-hour-files HH` to use a specific 24-hour cutoff
-(`00`–`23`) instead. The cutoff is exclusive: for example, `--play-hour-files
-10` selects files with hours `00` through `09`.
+Optionally, provide `--play-hour-files HH` to select only files for that exact
+24-hour prefix (`00`–`23`). For example, `--play-hour-files 07` selects only
+files starting with `07`, such as `0719_221126.mp3`. If the option is omitted,
+the script preserves the earlier behavior and selects hours strictly before the
+current hour.
 
 ```bash
 # See all options
@@ -96,7 +98,7 @@ Available arguments:
 | Argument | Description |
 | --- | --- |
 | `directory` | Required directory to search for matching MP3 files. |
-| `--play-hour-files HH` | Optional hour cutoff (`00`–`23`); selects filename hours strictly less than `HH`. Defaults to the current hour. |
+| `--play-hour-files HH` | Optional exact hour filter (`00`–`23`); selects only filenames whose HH prefix matches `HH`. If omitted, files from hours strictly earlier than the current hour are selected. |
 | `--regex REGEX` | Optional additional regular expression applied to each filename. |
 | `--recursive` | Search the directory tree recursively. |
 | `--m3u` | Create `filtered_playlist.m3u` and open that playlist in VLC. |
