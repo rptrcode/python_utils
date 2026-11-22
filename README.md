@@ -8,6 +8,7 @@ A modular CLI utility suite with subcommands, built using Python's standard libr
 python_scripts/
 ├── main.py                 # Central CLI dispatcher with subcommands
 ├── play_vlc.py             # Standalone filename-filtered VLC player
+├── move_dirs.py            # Move MP3 files one directory level up
 ├── utils/                  # Modular utilities package
 │   ├── __init__.py         # Package exports
 │   └── fs_utils.py         # Filesystem tools (e.g., clean-empty-dirs)
@@ -101,6 +102,30 @@ Available arguments:
 
 The script does not modify or delete the source MP3 files. Creating an M3U
 playlist writes the playlist file in the current working directory by default.
+
+### 4. Move MP3 Files One Level Up (`move_dirs.py`)
+
+This standalone script recursively finds `.mp3` files below the specified
+directory and moves each file into its parent directory (one level up). Files
+already directly inside the specified directory are left in place. If a
+destination file with the same name already exists, that file is skipped.
+Use `--dry-run` to preview moves without changing files.
+
+```bash
+# Preview eligible moves
+python3 move_dirs.py /path/to/recordings --dry-run
+
+# Move MP3 files one directory level up
+python3 move_dirs.py /path/to/recordings
+
+# Show command options
+python3 move_dirs.py --help
+```
+
+| Argument | Description |
+| --- | --- |
+| `directory` | Required directory to scan recursively for MP3 files. |
+| `--dry-run` | Print planned moves without modifying any files. |
 
 ---
 
